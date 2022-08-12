@@ -1,5 +1,6 @@
 import React from "react";
 import Square from "./Square";
+import { Button } from "antd";
 
 class Board extends React.Component<any, any> {
   constructor(props: any) {
@@ -56,16 +57,21 @@ class Board extends React.Component<any, any> {
     );
   }
 
+  reset() {
+    this.setState({
+      squares: Array(9).fill(null),
+      currentStep: "X",
+    });
+  }
+
   render() {
     const winner = this.calculateWinner(this.state.squares);
     let status;
-    if (winner) {
-      status = "Winner: " + winner;
-    } else {
-      status = "Next player: " + this.state.currentStep;
+    if (!winner) {
+      status = "轮到: " + this.state.currentStep;
     }
 
-    return (
+    return !winner ? (
       <div>
         <div className="status">{status}</div>
         <div className="board-row">
@@ -83,6 +89,11 @@ class Board extends React.Component<any, any> {
           {this.renderSquare(7)}
           {this.renderSquare(8)}
         </div>
+      </div>
+    ) : (
+      <div className="winner">
+        <p>胜利：{winner}</p>
+        <Button onClick={() => this.reset()}>重新开始</Button>
       </div>
     );
   }

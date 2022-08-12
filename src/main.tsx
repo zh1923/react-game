@@ -5,7 +5,8 @@ import App from "./App";
 import Expenses from "@/views/tic-tac-toe";
 import Invoices from "@/views/invoices";
 import Invoice from "@/views/invoices/invoice";
-import EliminateHappy from "@/views/eliminate-happy";
+import KeepLooking from "@/views/keep-looking";
+import LogicFlow from "@/views/logic-flow";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
@@ -14,7 +15,8 @@ ReactDOM.render(
     <Routes>
       <Route path="/" element={<App />}>
         <Route path="tic-tac-toe" element={<Expenses />} />
-        <Route path="eliminate-happy" element={<EliminateHappy />} />
+        <Route path="keep-looking" element={<KeepLooking />} />
+        <Route path="logic-flow" element={<LogicFlow />} />
         {/* {route.map((val) => {
           return (
             <Route

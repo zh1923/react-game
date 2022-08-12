@@ -24,8 +24,13 @@ export const route: RouteType[] = [
     menuName: "井字棋",
   },
   {
-    key: "eliminate-happy",
-    path: "eliminate-happy",
-    menuName: "消消乐",
+    key: "keep-looking",
+    path: "keep-looking",
+    menuName: "连连看",
+  },
+  {
+    key: "logic-flow",
+    path: "logic-flow",
+    menuName: "画布",
   },
 ];
