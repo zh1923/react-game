@@ -33,4 +33,9 @@ export const route: RouteType[] = [
     path: "logic-flow",
     menuName: "画布",
   },
+  {
+    key: "button",
+    path: "button",
+    menuName: "自定义按钮",
+  },
 ];

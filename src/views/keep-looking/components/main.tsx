@@ -1,6 +1,7 @@
 import React from "react";
 import "./index.less";
 import { getImage } from "@/assets";
+import { Button } from "antd";
 
 interface Table {
   sort: number;
@@ -16,6 +17,14 @@ interface State {
   randomList: number[];
   selected: [number, number] | [];
   stepList: any[];
+
+  oldSelected: Partial<{
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+    value: any;
+  }>;
 }
 
 export default class Main extends React.Component<any, State> {
@@ -43,6 +52,7 @@ export default class Main extends React.Component<any, State> {
       randomList: [],
       selected: [],
       stepList: [],
+      oldSelected: {},
     };
   }
 
@@ -125,11 +135,25 @@ export default class Main extends React.Component<any, State> {
       (trIndex !== this.state.selected[0] || tdIndex !== this.state.selected[1])
     ) {
       if (this.handEliminate(trIndex, tdIndex)) {
+        this.setState({
+          oldSelected: {
+            x0: this.state.selected[1],
+            y0: this.state.selected[0],
+            x1: tdIndex,
+            y1: trIndex,
+            value:
+              this.state.tableData[this.state.selected[0]!][
+                this.state.selected[1]!
+              ].value,
+          },
+        });
+
         let tableData;
         tableData = this.state.tableData;
         tableData[trIndex][tdIndex].value = undefined;
         tableData[this.state.selected[0]!][this.state.selected[1]!].value =
           undefined;
+
         this.setState({
           selected: [],
           tableData: tableData,
@@ -186,7 +210,7 @@ export default class Main extends React.Component<any, State> {
         this.state.selected[1]!
       )
     ) {
-      // 一条拐点
+      // 两条拐点
       return true;
     }
   }
@@ -203,8 +227,8 @@ export default class Main extends React.Component<any, State> {
       }
 
       for (let i = 0; i < Math.abs(step) - 1; i++) {
-        let index = y0 > tdIndex ? -i : i;
-        if (this.state.tableData[trIndex][index + start].value) {
+        let index = x0 > tdIndex ? -i : i;
+        if (this.state.tableData[trIndex][index + start]?.value !== undefined) {
           result = false;
           return false;
         }
@@ -231,7 +255,7 @@ export default class Main extends React.Component<any, State> {
 
       for (let i = 0; i < Math.abs(step) - 1; i++) {
         let index = y0 > trIndex ? -i : i;
-        if (this.state.tableData[index + start][tdIndex].value) {
+        if (this.state.tableData[index + start][tdIndex]?.value !== undefined) {
           result = false;
           return false;
         }
@@ -253,22 +277,122 @@ export default class Main extends React.Component<any, State> {
       return false;
     }
 
-    let result =
-      (this.Horizontal(y0, x0, y0, tdIndex) &&
-        this.Vertical(y0, tdIndex, trIndex, tdIndex)) ||
-      (this.Vertical(y0, x0, trIndex, x0) &&
-        this.Horizontal(trIndex, x0, trIndex, tdIndex));
+    let result = false;
+
+    if (this.state.tableData[y0][tdIndex].value === undefined) {
+      result =
+        this.Horizontal(y0, x0, y0, tdIndex) &&
+        this.Vertical(y0, tdIndex, trIndex, tdIndex);
+
+      if (result) {
+        return result;
+      }
+    }
+    if (this.state.tableData[trIndex][x0].value === undefined) {
+      result =
+        this.Vertical(y0, x0, trIndex, x0) &&
+        this.Horizontal(trIndex, x0, trIndex, tdIndex);
+
+      if (result) {
+        return result;
+      }
+    }
+
     return result;
+
+    // console.log(this.Horizontal(y0, x0, y0, tdIndex));
+    // console.log(this.Vertical(y0, tdIndex, trIndex, tdIndex));
+    // console.log(
+    //   this.Horizontal(y0, x0, y0, tdIndex) &&
+    //     this.Vertical(y0, tdIndex, trIndex, tdIndex)
+    // );
+
+    // console.log(this.Vertical(y0, x0, trIndex, x0));
+    // console.log(this.Horizontal(trIndex, x0, trIndex, tdIndex));
+    // console.log(
+    //   this.Vertical(y0, x0, trIndex, x0) &&
+    //     this.Horizontal(trIndex, x0, trIndex, tdIndex)
+    // );
+    // let result =
+    //   (this.Horizontal(y0, x0, y0, tdIndex) &&
+    //     this.Vertical(y0, tdIndex, trIndex, tdIndex)) ||
+    //   (this.Vertical(y0, x0, trIndex, x0) &&
+    //     this.Horizontal(trIndex, x0, trIndex, tdIndex));
+    // return result;
   }
 
   TwoPointPath(trIndex: number, tdIndex: number, y0: number, x0: number) {
-    
-    return false;
+    let flag = false;
+    for (let i = 0; i < this.state.stepY + 2; i++) {
+      for (let j = 0; j < this.state.stepX + 2; j++) {
+        if (
+          this.state.tableData[i][j].value ||
+          (i !== trIndex && i !== y0 && j !== tdIndex && j !== x0)
+        ) {
+          continue;
+        }
+        flag =
+          ((y0 !== i && x0 !== j) || (trIndex !== i && tdIndex !== j)
+            ? this.OnePoint(i, j, y0, x0)
+            : false) &&
+          (this.Vertical(trIndex, tdIndex, i, j) ||
+            this.Horizontal(trIndex, tdIndex, i, j));
+        // var flag2 =
+        //   this.OnePoint(i, j, trIndex, tdIndex) &&
+        //   (this.Vertical(y0, x0, i, j) || this.Horizontal(y0, x0, i, j));
+        // flag = flag1 || flag2;
+
+        if (flag) {
+          return true;
+        }
+      }
+    }
+    return flag;
+  }
+
+  // TwoPointPath(trIndex: number, tdIndex: number, y0: number, x0: number) {
+  //   let flag = false;
+  //   for (let i = 0; i < this.state.stepY; i++) {
+  //     for (let j = 0; j < this.state.stepX; j++) {
+  //       if (!this.state.tableData[i][j]) {
+  //         continue;
+  //       }
+  //       var flag1 =
+  //         this.OnePoint(y0, x0, i, j) &&
+  //         (this.Vertical(trIndex, tdIndex, j, j) || this.Horizontal(trIndex, tdIndex, i, j));
+  //       var flag2 =
+  //       this.OnePoint(trIndex, tdIndex, i, j) &&
+  //         (this.Vertical(y0, x0, i, j) || this.Horizontal(x0, y0, i, j));
+  //       flag = flag1 || flag2;
+  //     }
+  //   }
+  //   return flag;
+  // }
+
+  backOff() {
+    let tableData = this.state.tableData;
+
+    tableData[this.state.oldSelected.y0!][this.state.oldSelected.x0!].value =
+      this.state.oldSelected.value;
+    tableData[this.state.oldSelected.y1!][this.state.oldSelected.x1!].value =
+      this.state.oldSelected.value;
+
+    this.setState({
+      tableData,
+      oldSelected: {},
+    });
   }
 
   render() {
     return (
       <div className="content">
+        <Button
+          className="back-off"
+          onClick={() => this.backOff()}
+          disabled={!this.state.oldSelected.x0}
+        >
+          回退
+        </Button>
         <table>
           <tbody>
             {this.state.tableData.map((tr, trIndex) => {

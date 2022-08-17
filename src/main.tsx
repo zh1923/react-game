@@ -7,9 +7,15 @@ import Invoices from "@/views/invoices";
 import Invoice from "@/views/invoices/invoice";
 import KeepLooking from "@/views/keep-looking";
 import LogicFlow from "@/views/logic-flow";
+import ComponentView from "@/views/component-view";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
+
+function handClick() {
+  console.log('111')
+}
+
 ReactDOM.render(
   <HashRouter>
     <Routes>
@@ -17,6 +23,10 @@ ReactDOM.render(
         <Route path="tic-tac-toe" element={<Expenses />} />
         <Route path="keep-looking" element={<KeepLooking />} />
         <Route path="logic-flow" element={<LogicFlow />} />
+        <Route
+          path="button"
+          element={<ComponentView />}
+        />
         {/* {route.map((val) => {
           return (
             <Route

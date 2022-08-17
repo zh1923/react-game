@@ -5,12 +5,25 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  position: relative;
+
+  -webkit-user-drag: none;
+
+  .back-off {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
   table {
     border: 1px solid #c8c8c8;
     td {
       width: 32px;
       height: 36px;
       text-align: center;
+      img {
+        -webkit-user-drag: none;
+      }
 
       &.value {
         border: 1px solid #c8c8c8;
